@@ -2,8 +2,9 @@
           package="org.kitdroid.widget">
 
     <application android:allowBackup="true"
-                 android:label="@string/app_name"
-        >
+                 android:installLocation="auto"
+                 android:versionCode="3"
+                 android:versionName="@string/version_name">
 
     </application>
 
