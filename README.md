@@ -1,7 +1,7 @@
 # ElasticScrollView
 A scrollView,has elastic
 
-[![Sample image](./image/elastic_sample.gif)]
+![Sample image](./image/elastic_sample.gif)
 
 ### Version 1.0
 完成回弹功能
