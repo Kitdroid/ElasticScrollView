@@ -1,12 +1,9 @@
 package org.kitdroid.sample.elastic;
 
-
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.view.View.OnClickListener;
 import android.widget.ImageView;
 import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
@@ -37,7 +34,6 @@ public class MainActivity extends ActionBarActivity implements OnSeekBarChangeLi
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
@@ -54,7 +50,6 @@ public class MainActivity extends ActionBarActivity implements OnSeekBarChangeLi
                 break;
             }
         }
-
         return super.onOptionsItemSelected(item);
     }
 
@@ -78,13 +73,9 @@ public class MainActivity extends ActionBarActivity implements OnSeekBarChangeLi
     }
 
     @Override
-    public void onStartTrackingTouch(SeekBar seekBar) {
-
-    }
+    public void onStartTrackingTouch(SeekBar seekBar) { }
 
     @Override
-    public void onStopTrackingTouch(SeekBar seekBar) {
-
-    }
+    public void onStopTrackingTouch(SeekBar seekBar) { }
 
 }
