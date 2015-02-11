@@ -20,7 +20,7 @@ A scrollView,has elastic
 * 使用NindOldAndroid动画效果
 * 添加elasticId属性
 
-{% highlight xml %}
+{% highlight java %}
 
     <org.kitdroid.widget.ElasticScrollView
         app:elasticId="@+id/iv"
