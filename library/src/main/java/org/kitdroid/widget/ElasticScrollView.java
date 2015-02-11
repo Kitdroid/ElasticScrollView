@@ -3,13 +3,11 @@ package org.kitdroid.widget;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Rect;
-import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.animation.OvershootInterpolator;
 import android.widget.ScrollView;
-import android.widget.Scroller;
 
 import com.nineoldandroids.animation.ObjectAnimator;
 import com.nineoldandroids.animation.ValueAnimator;
@@ -36,7 +34,7 @@ public class ElasticScrollView extends ScrollView {
     /**
      * 回弹延迟
      */
-    private int restoreDelay = ELASTIC_DELAY;
+    private int resetDelay = ELASTIC_DELAY;
 
     /**
      * ScrollView的子View (ScrollView只能有一个子View)
@@ -48,7 +46,6 @@ public class ElasticScrollView extends ScrollView {
     private int originHeight;
     private Rect normalRect = new Rect();
     private int elasticId;
-    //    private Scroller mScroller;
 
 
     public ElasticScrollView(Context context, AttributeSet attrs) {
@@ -99,12 +96,12 @@ public class ElasticScrollView extends ScrollView {
         this.damk = damk;
     }
 
-    public int getRestoreDelay() {
-        return restoreDelay;
+    public int getResetDelay() {
+        return resetDelay;
     }
 
-    public void setRestoreDelay(int restoreDelay) {
-        this.restoreDelay = restoreDelay;
+    public void setResetDelay(int resetDelay) {
+        this.resetDelay = resetDelay;
     }
 
     @Override
@@ -204,7 +201,7 @@ public class ElasticScrollView extends ScrollView {
     }
 
     // 是否需要还原
-    private boolean isNeedRestore() {
+    private boolean isNeedReset() {
         if (elasticView == null) {
             return !normalRect.isEmpty();
         } else {
@@ -213,23 +210,23 @@ public class ElasticScrollView extends ScrollView {
     }
 
     private void doReset() {
-        boolean needRestore = isNeedRestore();
-        System.out.println("isNeedRestore:" + needRestore);
-        if (!needRestore) {
+        boolean needReset = isNeedReset();
+
+        if (!needReset) {
             return;
         }
 
         if (elasticView != null) {
-            restoreElasticView();
+            resetElasticView();
         } else {
-            restoreInnerView();
+            resetInnerView();
         }
     }
 
-    private void restoreElasticView() {
+    private void resetElasticView() {
 
         ValueAnimator animator = ObjectAnimator.ofInt(elasticView.getLayoutParams().height, originHeight);
-        animator.setDuration(restoreDelay);
+        animator.setDuration(resetDelay);
         animator.setInterpolator(new OvershootInterpolator());
 
         animator.addUpdateListener(new AnimatorUpdateListener() {
@@ -246,17 +243,17 @@ public class ElasticScrollView extends ScrollView {
 
     }
 
-    private void restoreInnerView() {
-
-        ValueAnimator animator = ObjectAnimator.ofInt(mInnerView.getTop(), normalRect.top);
-        animator.setDuration(restoreDelay);
+    private void resetInnerView() {
+        int moveY = mInnerView.getTop() - normalRect.top;
+        ValueAnimator animator = ObjectAnimator.ofInt(moveY, 0);
+        animator.setDuration(resetDelay);
         animator.setInterpolator(new OvershootInterpolator());
 
         animator.addUpdateListener(new AnimatorUpdateListener() {
             @Override
             public void onAnimationUpdate(ValueAnimator animation) {
                 int value = (Integer) animation.getAnimatedValue();
-                mInnerView.layout(normalRect.left, value, normalRect.right, mInnerView.getBottom());// 设置回到正常的布局位置
+                mInnerView.layout(normalRect.left, normalRect.top + value, normalRect.right, normalRect.bottom + value );
             }
         });
         animator.start();
