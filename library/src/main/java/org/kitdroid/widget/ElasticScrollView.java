@@ -1,7 +1,9 @@
 package org.kitdroid.widget;
 
 import android.content.Context;
+import android.content.res.TypedArray;
 import android.graphics.Rect;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
@@ -45,19 +47,39 @@ public class ElasticScrollView extends ScrollView {
     private float startY;
     private int originHeight;
     private Rect normalRect = new Rect();
-    private Scroller mScroller;
+    private int elasticId;
+    //    private Scroller mScroller;
 
 
     public ElasticScrollView(Context context, AttributeSet attrs) {
         super(context, attrs);
+        readStyleAttributes(context, attrs, 0);
+    }
+
+    public ElasticScrollView(Context context, AttributeSet attrs, int defStyleAttr) {
+        super(context, attrs, defStyleAttr);
+        readStyleAttributes(context, attrs, 0);
     }
 
     @Override
     protected void onFinishInflate() {
-        if (getChildCount() > 0) {
-            mInnerView = getChildAt(0);
+        if (getChildCount() == 0) {
+            return;
         }
-        mScroller = new Scroller(getContext());
+        mInnerView = getChildAt(0);
+        if (elasticId != 0) {
+            View viewById = findViewById(elasticId);
+            setElasticView(viewById);
+        }
+    }
+
+    protected void readStyleAttributes(Context context, AttributeSet attrs, int defStyle) {
+
+        TypedArray a = context.obtainStyledAttributes(attrs, R.styleable.elastic_scroll, 0, defStyle);
+
+        elasticId = a.getResourceId(R.styleable.elastic_scroll_elasticId, 0);
+
+        a.recycle();
     }
 
     public void setElasticView(View view) {
