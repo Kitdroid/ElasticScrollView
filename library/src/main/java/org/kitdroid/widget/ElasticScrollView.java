@@ -5,9 +5,13 @@ import android.graphics.Rect;
 import android.util.AttributeSet;
 import android.view.MotionEvent;
 import android.view.View;
-import android.view.animation.TranslateAnimation;
+import android.view.animation.OvershootInterpolator;
 import android.widget.ScrollView;
 import android.widget.Scroller;
+
+import com.nineoldandroids.animation.ObjectAnimator;
+import com.nineoldandroids.animation.ValueAnimator;
+import com.nineoldandroids.animation.ValueAnimator.AnimatorUpdateListener;
 
 /**
  * ScrollView反弹效果的实现
@@ -42,7 +46,6 @@ public class ElasticScrollView extends ScrollView {
     private int originHeight;
     private Rect normalRect = new Rect();
     private Scroller mScroller;
-
 
 
     public ElasticScrollView(Context context, AttributeSet attrs) {
@@ -85,7 +88,7 @@ public class ElasticScrollView extends ScrollView {
     @Override
     public boolean onInterceptTouchEvent(MotionEvent ev) {
         int action = ev.getAction();
-        System.out.println("onInterceptTouchEvent: "+action);
+
         switch (action) {
             case MotionEvent.ACTION_DOWN: {
                 startY = ev.getY();
@@ -111,12 +114,7 @@ public class ElasticScrollView extends ScrollView {
 
     private void computeMove(MotionEvent event) {
         int action = event.getAction();
-        System.out.println("onTouchEvent: "+action);
         switch (action) {
-//            case MotionEvent.ACTION_DOWN: {
-//                startY = event.getY();
-//                break;
-//            }
             case MotionEvent.ACTION_UP: {
                 doReset();
                 break;
@@ -185,11 +183,17 @@ public class ElasticScrollView extends ScrollView {
 
     // 是否需要还原
     private boolean isNeedRestore() {
-        return !normalRect.isEmpty();
+        if (elasticView == null) {
+            return !normalRect.isEmpty();
+        } else {
+            return originHeight != elasticView.getLayoutParams().height;
+        }
     }
 
     private void doReset() {
-        if (!isNeedRestore()) {
+        boolean needRestore = isNeedRestore();
+        System.out.println("isNeedRestore:" + needRestore);
+        if (!needRestore) {
             return;
         }
 
@@ -201,31 +205,45 @@ public class ElasticScrollView extends ScrollView {
     }
 
     private void restoreElasticView() {
-        android.view.ViewGroup.LayoutParams layoutParams = elasticView.getLayoutParams();
-        mScroller.startScroll(0, layoutParams.height, 0, originHeight - layoutParams.height, restoreDelay);
-        invalidate();
+
+        ValueAnimator animator = ObjectAnimator.ofInt(elasticView.getLayoutParams().height, originHeight);
+        animator.setDuration(restoreDelay);
+        animator.setInterpolator(new OvershootInterpolator());
+
+        animator.addUpdateListener(new AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int value = (Integer) animation.getAnimatedValue();
+                android.view.ViewGroup.LayoutParams layoutParams = elasticView.getLayoutParams();
+                layoutParams.height = value;
+                elasticView.setLayoutParams(layoutParams);
+
+            }
+        });
+        animator.start();
+
     }
 
     private void restoreInnerView() {
-        TranslateAnimation ta = new TranslateAnimation(0, 0, mInnerView.getTop(), normalRect.top);
-        ta.setDuration(restoreDelay);
-        mInnerView.startAnimation(ta);// 开启移动动画
 
-        mInnerView.layout(normalRect.left, normalRect.top, normalRect.right, normalRect.bottom);// 设置回到正常的布局位置
+        ValueAnimator animator = ObjectAnimator.ofInt(mInnerView.getTop(), normalRect.top);
+        animator.setDuration(restoreDelay);
+        animator.setInterpolator(new OvershootInterpolator());
 
-        normalRect.setEmpty();
+        animator.addUpdateListener(new AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator animation) {
+                int value = (Integer) animation.getAnimatedValue();
+                mInnerView.layout(normalRect.left, value, normalRect.right, mInnerView.getBottom());// 设置回到正常的布局位置
+            }
+        });
+        animator.start();
+
     }
 
     // 是否需要移动布局
     private boolean isNeedMove(int deltaY) {
         return deltaY == 0 ? false : (deltaY < 0 ? isNeedMoveTop() : isNeedMoveBottom());
-//        if (deltaY < 0) {
-//            return isNeedMoveTop();
-//        }
-//        if (deltaY > 0) {
-//            return isNeedMoveBottom();
-//        }
-//        return false;
     }
 
     private boolean isNeedMoveTop() {
