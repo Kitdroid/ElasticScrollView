@@ -196,7 +196,7 @@ public class ElasticScrollView extends ScrollView {
 
     private void moveElasticView(int deltaY) {
         android.view.ViewGroup.LayoutParams layoutParams = elasticView.getLayoutParams();
-        layoutParams.height -= deltaY;
+        layoutParams.height = Math.max(0,layoutParams.height - deltaY);
         elasticView.setLayoutParams(layoutParams);
     }
 

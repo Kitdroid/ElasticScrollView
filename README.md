@@ -15,9 +15,10 @@ A scrollView,has elastic
 * setElasticVIew()
 设置被拉伸的View.如果不设置或设置为null,则ScrollVie跟随手势移动
 
-### Version 1.1
+### Version 1.2
 
 * 使用NindOldAndroid动画效果
+* 修复Bug: elasticView向上滑动至height == -1时,被认为是wrap_content的问题
 * 添加elasticId属性
 
 Sample Code:
