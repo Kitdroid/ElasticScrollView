@@ -22,8 +22,9 @@ A scrollView,has elastic
 * 添加elasticId属性
 
 Sample Code:
-
-    <org.kitdroid.widget.ElasticScrollView
-        app:elasticId="@+id/iv"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"/>
+``` xml
+<org.kitdroid.widget.ElasticScrollView
+    app:elasticId="@+id/iv"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"/>
+```
